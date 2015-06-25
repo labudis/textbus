@@ -1,6 +1,7 @@
  <?php
 
     require "lib/twilio/Services/Twilio.php";
+    include "helpers.php";
 
     // set your AccountSid and AuthToken from www.twilio.com/user/account
     $AccountSid = "AC76809471f6ff3116507257fe31f2a595";
@@ -11,16 +12,27 @@
 
 
 
-
-
-    // Loop over the list of messages and echo a property for each one
+    // Get all inbound messages from Twilio
     foreach ($client->account->messages as $message) {
         if ($message->direction == "inbound") {
-            echo $message->body;
-            echo $message->from;
+           
+            // Show the original message
+            //echo $message->body;
+            //echo "<br>";
+
+            $locations = parseLocations($message->body);
+            print_r($locations);
+
+            //echo $message->from;
             echo "<br>";
         }
     }
+
+
+
+
+
+
 
 
 
@@ -33,6 +45,9 @@
 
     // // Display a confirmation message on the screen
     // echo "Sent message {$message->sid}";
+
+
+
 
    
 ?>
