@@ -1,15 +1,34 @@
  <?php
-
-    require "lib/twilio/Services/Twilio.php";
+    // helpers
     include "helpers.php";
-
-    // set your AccountSid and AuthToken from www.twilio.com/user/account
+   
+    // Twilio
+    require "lib/twilio/Services/Twilio.php";
     $AccountSid = "AC76809471f6ff3116507257fe31f2a595";
     $AuthToken = "5ff20a1f6f13fc44e0e67689dfbe5e3c";
     $fromNumber = "441785472337";
-
     $client = new Services_Twilio($AccountSid, $AuthToken);
 
+    // MySQL database
+    $user = 'root';
+    $password = 'root';
+    $db = 'inventory';
+    $host = 'localhost';
+    $port = 3306;
+
+    $link = mysqli_init();
+    $success = mysqli_real_connect(
+       $link, 
+       $host, 
+       $user, 
+       $password, 
+       $db,
+       $port
+    );
+
+
+
+    // START
 
     // Parse through all messages from Twilio
     foreach ($client->account->messages as $message) {
