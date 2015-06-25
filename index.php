@@ -37,7 +37,7 @@
             //echo "<br>";
 
 
-            $sql = "INSERT INTO requests (Sid, message, phone) VALUES ('$message->sid', '$message->body', '$message->from')";
+            $sql = "INSERT INTO requests (Sid, message, phone) VALUES ('$message->sid', '$message->body', '$message->from') ON DUPLICATE KEY UPDATE Sid=Sid";
 
             if (mysqli_query($conn, $sql)) {
                 //echo "New record created successfully<br>";
