@@ -102,10 +102,15 @@ function getDirections($locations){
 function formatResponse($buses) {
 
 	//var_dump($buses);
-	
+
 	$bus = $buses[0];
 
-	$response = 'Take bus ' . $bus->name_short . ' (' . $bus->headsign	. ') at ' . $bus->departure_time . ' ' . $bus->stop_name;
+	if ($bus) {
+		$response = 'Take bus ' . $bus->name_short . ' (' . $bus->headsign	. ') at ' . $bus->departure_time . ' ' . $bus->stop_name;
+	} else {
+		$response = 'Sorry, there is no bus nearby';
+	}
+	
 
 	return $response;
 
