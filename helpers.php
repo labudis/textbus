@@ -43,16 +43,20 @@ function getJSON($url) {
 
 
 function getDirections($locations){
+
+	// Prepare the array
+	$buses = array();
+
 	// Our parameters
 	$params = array(
 		'key'			=> 'AIzaSyAc3DkAB-03kNJVxCj5I_Wh3xdVDgGENjE',
-	    'origin'        => 'EH3 9DR',
-	    'destination'   => 'EH10 5AG',
+	    'origin'        => $locations['origin'],
+	    'destination'   => $locations['destination'],
 	    'region'		=> 'gb',
-	    'sensor'        => 'true',
+	    'sensor'        => 'false',
 	    'mode'   		=> 'transit',
 	    'transit_mode'  => 'bus',
-	    'transit_routing_preference' => 'fewer_transfers',
+	   // 'transit_routing_preference' => 'fewer_transfers',
 	    'departure_time' => 'now',
 	    'units'         => 'imperial'
 	);
@@ -68,34 +72,39 @@ function getDirections($locations){
 	// Call the API
 	$directions = getJSON($url);
 
-	return $directions;
-
-}
-
-function formatResponse($directions) {
-
+	// Extract bus information only
 	foreach ($directions->routes[0]->legs[0]->steps as $steps){
 
-		// Get the bus name
+		// Get the bus details
 		if ($steps->travel_mode == "TRANSIT" ) {
-			$bus_name_short = $steps->transit_details->line->short_name;
-			$bus_name_long = $steps->transit_details->line->name;
-			
-			//echo $bus_name_short . ' ('.$bus_name_long.')';
 
-			break;
+			$bus = array(
+
+				'name_short'		=> $steps->transit_details->line->short_name,
+				'name_long' 		=> $steps->transit_details->line->name,
+				'headsign'			=> $steps->transit_details->headsign,
+				'departure_time' 	=> $steps->transit_details->departure_time->text,
+				'stop_name' 		=> $steps->transit_details->departure_stop->name
+			);
+
+			$buses[] = $bus;
+					
 		}
-
-
-
 	}
-	
 
-
-
+	return $buses;
 
 }
 
+
+
+function formatResponse($buses) {
+
+	print_r($buses);
+
+
+		
+	}
 
 
  ?>

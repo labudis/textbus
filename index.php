@@ -23,11 +23,11 @@
             // Parse locations from SMS
             $locations = parseLocations($message->body);
 
-            $directions = getDirections($locations);
+            $buses = getDirections($locations);
 
-            formatResponse($directions);
+            echo formatResponse($buses);
 
-            break;
+            //break;
 
 
 
