@@ -106,15 +106,13 @@ function formatResponse($buses) {
 	$bus = $buses[0];
 
 	if ($bus) {
-		$response = 'Take bus ' . $bus->name_short . ' (' . $bus->headsign	. ') at ' . $bus->departure_time . ' ' . $bus->stop_name;
+		$response = 'Bus ' . $bus->name_short . ' for ' . $bus->headsign	. ' at ' . $bus->departure_time . ' from ' . $bus->stop_name;
 	} else {
 		$response = 'Sorry, there is no bus nearby';
 	}
 	
-
 	return $response;
 
 	}
-
 
  ?>
