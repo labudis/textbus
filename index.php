@@ -30,16 +30,27 @@
         // Show inbound messages only
         if ($message->direction == "inbound") {
            
+
+            //print_r($message);
             // Show the original message
             //echo $message->body;
             //echo "<br>";
 
+
+            $sql = "INSERT INTO requests (Sid, message, phone) VALUES ('$message->sid', '$message->body', '$message->from')";
+
+            if (mysqli_query($conn, $sql)) {
+                //echo "New record created successfully<br>";
+            } else {
+                echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+            }
+
             // Parse locations from SMS
-            $locations = parseLocations($message->body);
+            //$locations = parseLocations($message->body);
 
-            $buses = getDirections($locations);
+            //$buses = getDirections($locations);
 
-            echo formatResponse($buses);
+            //echo formatResponse($buses);
 
             //break;
 
@@ -47,7 +58,7 @@
 
             // Sender number
             //echo $message->from;
-            echo "<br>";
+            //echo "<br>";
         }
     }
 
