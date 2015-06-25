@@ -64,29 +64,29 @@
         $buses = getDirections($locations);
 
         // Format the response
-        echo formatResponse($buses);
+        $response = formatResponse($buses);
+
+        // Send a response
+        $message = $client->account->messages->create(array(
+            "From"  => $fromNumber,
+            "To"    => $request["phone"],
+            "Body"  => $response,
+        ));
+
+        // Update the status of the request
+        $requestSid = $request['Sid'];
+        $sql = "UPDATE requests SET status='1' WHERE Sid='$requestSid'";
+
+        if ($conn->query($sql) === TRUE) {
+            echo "Record updated successfully";
+        } else {
+            echo "Error updating record: " . $conn->error;
+        }
 
     }
 
 
 
-
-
-
-
-
-
-
-
-    // // Send a message
-    // $message = $client->account->messages->create(array(
-    //     "From" => $fromNumber,
-    //     "To" => "447530936914",
-    //     "Body" => "Test message!",
-    // ));
-
-    // // Display a confirmation message on the screen
-    // echo "Sent message {$message->sid}";
 
 
 
