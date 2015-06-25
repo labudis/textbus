@@ -11,25 +11,31 @@
     $client = new Services_Twilio($AccountSid, $AuthToken);
 
 
-
-    // Get all inbound messages from Twilio
+    // Parse through all messages from Twilio
     foreach ($client->account->messages as $message) {
+        // Show inbound messages only
         if ($message->direction == "inbound") {
            
             // Show the original message
             //echo $message->body;
             //echo "<br>";
 
+            // Parse locations from SMS
             $locations = parseLocations($message->body);
-            print_r($locations);
 
+            $directions = getDirections($locations);
+
+            formatResponse($directions);
+
+            break;
+
+
+
+            // Sender number
             //echo $message->from;
             echo "<br>";
         }
     }
-
-
-
 
 
 
