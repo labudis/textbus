@@ -30,14 +30,10 @@
         // Show inbound messages only
         if ($message->direction == "inbound") {
            
-
-            //print_r($message);
-            // Show the original message
-            //echo $message->body;
-            //echo "<br>";
-
-
-            $sql = "INSERT INTO requests (Sid, message, phone) VALUES ('$message->sid', '$message->body', '$message->from') ON DUPLICATE KEY UPDATE Sid=Sid";
+            // Save messages to the database if they don't already exist
+            $sql = "INSERT INTO requests (Sid, message, phone) 
+                        VALUES ('$message->sid', '$message->body', '$message->from') 
+                            ON DUPLICATE KEY UPDATE Sid=Sid";
 
             if (mysqli_query($conn, $sql)) {
                 //echo "New record created successfully<br>";
@@ -45,22 +41,37 @@
                 echo "Error: " . $sql . "<br>" . mysqli_error($conn);
             }
 
-            // Parse locations from SMS
-            //$locations = parseLocations($message->body);
-
-            //$buses = getDirections($locations);
-
-            //echo formatResponse($buses);
-
-            //break;
-
-
-
-            // Sender number
-            //echo $message->from;
-            //echo "<br>";
         }
     }
+
+
+    // STEP 2: PARSE THROUGH THE DB AND SEND RESPONSES TO NEW REQUESTS
+
+    // Get new requests from the database
+    $sql = "SELECT Sid, message, phone, status FROM requests WHERE status <> 1";
+    $requests = $conn->query($sql);
+
+    //var_dump($result);
+
+    // Process each new request
+    foreach ($requests as $request) {
+        //print_r($request);
+
+        // Extract location information from the message
+        $locations = parseLocations($request->message);
+
+        // Get the bus times 
+        $buses = getDirections($locations);
+
+        // Format the response
+        echo formatResponse($buses);
+
+    }
+
+
+
+
+
 
 
 
