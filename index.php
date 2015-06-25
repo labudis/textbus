@@ -12,23 +12,18 @@
     // MySQL database
     $user = 'root';
     $password = 'root';
-    $db = 'inventory';
+    $db = 'textbus';
     $host = 'localhost';
     $port = 3306;
 
-    $link = mysqli_init();
-    $success = mysqli_real_connect(
-       $link, 
-       $host, 
-       $user, 
-       $password, 
-       $db,
-       $port
-    );
+    // Create connection
+    $conn = mysqli_connect($host, $user, $password, $db, $port);
+    // Check connection
+    if (!$conn) {
+        die("Connection failed: " . mysqli_connect_error());
+    }
 
-
-
-    // START
+    // STEP 1: GET AND SAVE DIRECTION REQUESTS IN DB
 
     // Parse through all messages from Twilio
     foreach ($client->account->messages as $message) {
@@ -74,5 +69,7 @@
 
 
 
-   
+    // Close the DB connection   
+    mysqli_close($conn);
+
 ?>
