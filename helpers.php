@@ -72,20 +72,21 @@ function getDirections($locations){
 	// Call the API
 	$directions = getJSON($url);
 
+	//var_dump($directions);
+
 	// Extract bus information only
 	foreach ($directions->routes[0]->legs[0]->steps as $steps){
 
 		// Get the bus details
 		if ($steps->travel_mode == "TRANSIT" ) {
 
-			$bus = array(
-
-				'name_short'		=> $steps->transit_details->line->short_name,
-				'name_long' 		=> $steps->transit_details->line->name,
-				'headsign'			=> $steps->transit_details->headsign,
-				'departure_time' 	=> $steps->transit_details->departure_time->text,
-				'stop_name' 		=> $steps->transit_details->departure_stop->name
-			);
+			$bus = new stdClass();
+			
+			$bus->name_short		= $steps->transit_details->line->short_name;
+			$bus->name_long 		= $steps->transit_details->line->name;
+			$bus->headsign			= $steps->transit_details->headsign;
+			$bus->departure_time 	= $steps->transit_details->departure_time->text;
+			$bus->stop_name 		= $steps->transit_details->departure_stop->name;
 
 			$buses[] = $bus;
 					
@@ -100,10 +101,14 @@ function getDirections($locations){
 
 function formatResponse($buses) {
 
-	print_r($buses);
+	//var_dump($buses);
+	
+	$bus = $buses[0];
 
+	$response = 'Take bus ' . $bus->name_short . ' (' . $bus->headsign	. ') at ' . $bus->departure_time . ' ' . $bus->stop_name;
 
-		
+	return $response;
+
 	}
 
 

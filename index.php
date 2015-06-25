@@ -58,7 +58,7 @@
         //print_r($request);
 
         // Extract location information from the message
-        $locations = parseLocations($request->message);
+        $locations = parseLocations($request["message"]);
 
         // Get the bus times 
         $buses = getDirections($locations);
