@@ -43,21 +43,14 @@
         if ($sendingON == true) {
 
             // Send a response
-            $message = $client->account->messages->create(array(
-                "From"  => $fromNumber,
-                "To"    => $request["phone"],
-                "Body"  => $response,
-            ));
+            // $message = $client->account->messages->create(array(
+            //     "From"  => $fromNumber,
+            //     "To"    => $request["phone"],
+            //     "Body"  => $response,
+            // ));
 
-            // Update the status of the request
-            $requestSid = $request['Sid'];
-            $UpdateSQL = "UPDATE requests SET status='1' WHERE Sid='$requestSid'";
+            updateRequestStatus($request['Sid'], $conn);
 
-            if ($conn->query($UpdateSQL) === TRUE) {
-                //echo "Record updated successfully";
-            } else {
-                echo "Error updating record: " . $conn->error;
-            }
 
         } else {
             echo "Sending is turned off. Please check the settings!<Br>";
