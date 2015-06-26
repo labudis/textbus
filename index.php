@@ -15,11 +15,12 @@
     }
 
     // STEP 1: GET AND SAVE DIRECTION REQUESTS IN DB
-    saveMessages($client->account->messages);
+    saveMessages($client->account->messages, $conn);
 
     // STEP 2: PARSE THROUGH THE DB AND SEND RESPONSES TO NEW REQUESTS
-    $GetSQL = "SELECT Sid, message, phone, status FROM requests WHERE status <> 1";
-    $requests = $conn->query($GetSQL);
+
+    // Get new requests
+    $requests = getNewRequests($conn);
 
     // Process each new request
     foreach ($requests as $request) {
@@ -32,7 +33,6 @@
 
         // Get the bus times 
         $buses = getDirections($locations);
-
         //print_r($buses);
 
         // Format the response

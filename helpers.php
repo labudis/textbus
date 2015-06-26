@@ -41,10 +41,11 @@
 
 
 	// Save new messages to the database
-	function saveMessages($messages) {
+	function saveMessages($messages, $conn) {
 
 	    // Parse through all messages from Twilio
-	    foreach ($client->account->messages as $message) {
+	    foreach ($messages as $message) {
+
 	        // Show inbound messages only
 	        if ($message->direction == "inbound") {
 
@@ -64,6 +65,16 @@
 
 	        }
 	    }
+
+	}
+
+	// Get new requests
+	function getNewRequests($conn) {
+
+		$GetSQL = "SELECT Sid, message, phone, status FROM requests WHERE status <> 1";
+	    $requests = $conn->query($GetSQL);
+
+	    return $requests;
 
 	}
 
