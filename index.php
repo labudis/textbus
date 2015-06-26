@@ -31,15 +31,10 @@
         // Determine the request type
         $request = analyseRequest($request);
 
-        print_r($request);
-
         if ($request["type"] == 'directions') {
             
-            // Extract location information from the message
-            $locations = parseLocations($request["message"]);
-
             // Get the bus times 
-            $buses = getDirections($locations);
+            $buses = getDirections($request["origin"], $request["destination"]);
             //print_r($buses);
 
             // Format the response
@@ -70,6 +65,7 @@
 
         } else {
 
+            // Update settings
             updateLocations($request, $conn);
 
         }

@@ -2,23 +2,6 @@
 
 	//Helpers
 
-	// Parse locations from SMS
-	 function parseLocations($text) {
-		
-	    // Parse out origin and destination
-	    if (strpos($text,'to') !== false){ 
-
-	    	$array = preg_split('/To|to/', $text);
-
-	    	$locations['origin'] = $array[0]; 
-	    	$locations['destination'] = $array[1]; 
-
-	    	return $locations;
-	    } else {
-	    	return false;
-	    }
-	}
-
 	// Plural or singular
 	function plural( $amount, $singular = '', $plural = 's' ) {
 	    if ( $amount == 1 )
@@ -49,6 +32,39 @@
 		$message = str_replace("'", "", $message);
 
 		return $message;
+	}
+
+
+	// Determine the type of request
+	function analyseRequest($request) {
+
+		// Clean the message
+        $message = cleanMessage($request["message"]);
+
+        // Determine type
+		if (startsWith($message, 'home set') == true) {
+
+			$request["type"] = 'home';
+			$array = preg_split('/set/', $message);
+	    	$request['parameter'] = $array[1]; 
+
+		} else if (startsWith($message, 'work set') == true) {
+
+			$request["type"] = 'work';
+			$array = preg_split('/set/', $message);
+	    	$request['parameter'] = $array[1]; 
+	    	
+		} else {
+			$request["type"] = 'directions';
+
+           	// Parse out origin and destination
+	    	$array = preg_split('/To|to/', $request["message"]);
+	    	$request['origin'] = $array[0]; 
+	    	$request['destination'] = $array[1]; 
+		}
+
+		return $request;
+
 	}
 
 
@@ -134,7 +150,7 @@
         $UpdateSQL = "UPDATE users SET $type='$location' WHERE phone='$phone'";
 
         if ($conn->query($UpdateSQL) === TRUE) {
-            echo "Record updated successfully";
+            echo "Record updated successfully<br>";
         } else {
             echo "Error updating record: " . $conn->error;
         }
@@ -143,7 +159,7 @@
 
 
 	// Get directions based on origin and destination
-	function getDirections($locations) {
+	function getDirections($origin, $destination) {
 
 		// Prepare the array
 		$buses = array();
@@ -151,8 +167,8 @@
 		// Our parameters
 		$params = array(
 			'key'			=> 'AIzaSyAc3DkAB-03kNJVxCj5I_Wh3xdVDgGENjE',
-		    'origin'        => $locations['origin'],
-		    'destination'   => $locations['destination'],
+		    'origin'        => $origin,
+		    'destination'   => $destination,
 		    'region'		=> 'gb',
 		    'sensor'        => 'false',
 		    'mode'   		=> 'transit',
@@ -242,29 +258,7 @@
 	}
 
 
-	// Determine the type of request
-	function analyseRequest($request) {
 
-		// Clean the message
-        $message = cleanMessage($request["message"]);
-
-        // Determine type
-		if (startsWith($message, 'home set') == true) {
-			$request["type"] = 'home';
-			$array = preg_split('/set/', $message);
-	    	$request['parameter'] = $array[1]; 
-
-		} else if (startsWith($message, 'work set') == true) {
-			$request["type"] = 'work';
-			$array = preg_split('/set/', $message);
-	    	$request['parameter'] = $array[1]; 
-		} else {
-			$request["type"] = 'directions';
-		}
-
-		return $request;
-
-	}
 
 
  ?>
