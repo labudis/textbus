@@ -15,37 +15,11 @@
     }
 
     // STEP 1: GET AND SAVE DIRECTION REQUESTS IN DB
-
-    // Parse through all messages from Twilio
-    foreach ($client->account->messages as $message) {
-        // Show inbound messages only
-        if ($message->direction == "inbound") {
-
-            // Strip apostrophes
-            $messageBody = str_replace("'", "", $message->body);
-           
-            // Save messages to the database if they don't already exist
-            $SaveSQL = "INSERT INTO requests (Sid, message, phone) 
-                        VALUES ('$message->sid', '$messageBody', '$message->from') 
-                            ON DUPLICATE KEY UPDATE Sid=Sid";
-
-            if (mysqli_query($conn, $SaveSQL)) {
-                //echo "New record created successfully<br>";
-            } else {
-                echo "Error: " . $SaveSQL . "<br>" . mysqli_error($conn);
-            }
-
-        }
-    }
-
+    saveMessages($client->account->messages);
 
     // STEP 2: PARSE THROUGH THE DB AND SEND RESPONSES TO NEW REQUESTS
-
-    // Get new requests from the database
     $GetSQL = "SELECT Sid, message, phone, status FROM requests WHERE status <> 1";
     $requests = $conn->query($GetSQL);
-
-    //var_dump($result);
 
     // Process each new request
     foreach ($requests as $request) {
@@ -58,6 +32,8 @@
 
         // Get the bus times 
         $buses = getDirections($locations);
+
+        //print_r($buses);
 
         // Format the response
         $response = formatResponse($buses);

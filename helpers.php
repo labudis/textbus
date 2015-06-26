@@ -41,8 +41,35 @@ function getJSON($url) {
 	return $json;
 }
 
+// Save new messages to the database
+function saveMessages($messages) {
 
-function getDirections($locations){
+    // Parse through all messages from Twilio
+    foreach ($client->account->messages as $message) {
+        // Show inbound messages only
+        if ($message->direction == "inbound") {
+
+            // Strip apostrophes
+            $messageBody = str_replace("'", "", $message->body);
+           
+            // Save messages to the database if they don't already exist
+            $SaveSQL = "INSERT INTO requests (Sid, message, phone) 
+                        VALUES ('$message->sid', '$messageBody', '$message->from') 
+                            ON DUPLICATE KEY UPDATE Sid=Sid";
+
+            if (mysqli_query($conn, $SaveSQL)) {
+                //echo "New record created successfully<br>";
+            } else {
+                echo "Error: " . $SaveSQL . "<br>" . mysqli_error($conn);
+            }
+
+        }
+    }
+
+}
+
+// Get directions based on origin and destination
+function getDirections($locations) {
 
 	// Prepare the array
 	$buses = array();
