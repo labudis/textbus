@@ -19,6 +19,14 @@
 	    }
 	}
 
+	// Plural or singular
+	function plural( $amount, $singular = '', $plural = 's' ) {
+	    if ( $amount == 1 )
+	        return $singular;
+	    else
+	        return $plural;
+	}
+
 
 	// Make our API request
 	function getJSON($url) {
@@ -125,6 +133,7 @@
 				$bus->headsign			= $steps->transit_details->headsign;
 				$bus->departure_time 	= $steps->transit_details->departure_time->text;
 				$bus->stop_name 		= $steps->transit_details->departure_stop->name;
+				$bus->stop_count        = $steps->transit_details->num_stops;
 
 				$buses[] = $bus;
 						
@@ -143,8 +152,10 @@
 
 		$bus = $buses[0];
 
+		print_r($bus);
+
 		if ($bus) {
-			$response = 'Bus ' . $bus->name_short . ' for ' . $bus->headsign	. ' at ' . $bus->departure_time . ' from ' . $bus->stop_name;
+			$response = 'Take bus ' . $bus->name_short . ' for ' . $bus->headsign . ' at ' . $bus->departure_time . ' from stop ' . $bus->stop_name . ' and get off after ' . $bus->stop_count . ' stop' . plural($bus->stop_count) . '.';
 		} else {
 			$response = 'Sorry, there is no bus nearby';
 		}
