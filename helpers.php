@@ -123,6 +123,24 @@
 
 	}
 
+	// Update user's predefined locations
+	function updateLocations($request, $conn) {
+
+		$type 		= $request["type"];
+		$location 	= $request["parameter"];
+		$phone 		= $request["phone"];
+
+		// Update the location
+        $UpdateSQL = "UPDATE users SET $type='$location' WHERE phone='$phone'";
+
+        if ($conn->query($UpdateSQL) === TRUE) {
+            echo "Record updated successfully";
+        } else {
+            echo "Error updating record: " . $conn->error;
+        }
+
+	}
+
 
 	// Get directions based on origin and destination
 	function getDirections($locations) {
@@ -225,17 +243,26 @@
 
 
 	// Determine the type of request
-	function getRequestType($message) {
+	function analyseRequest($request) {
 
+		// Clean the message
+        $message = cleanMessage($request["message"]);
+
+        // Determine type
 		if (startsWith($message, 'home set') == true) {
-			$type = 'home';
+			$request["type"] = 'home';
+			$array = preg_split('/set/', $message);
+	    	$request['parameter'] = $array[1]; 
+
 		} else if (startsWith($message, 'work set') == true) {
-			$type = 'work';
+			$request["type"] = 'work';
+			$array = preg_split('/set/', $message);
+	    	$request['parameter'] = $array[1]; 
 		} else {
-			$type = 'directions';
+			$request["type"] = 'directions';
 		}
 
-		return $type;
+		return $request;
 
 	}
 

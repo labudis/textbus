@@ -28,45 +28,53 @@
         // Print a log message
         echo 'A new bus directions request from ' . $request["phone"] . ' for ' .  $request["message"] . '<br>';
 
-        // Clean the message
-        $message = cleanMessage($request["message"]);
-
         // Determine the request type
-        $requestType = getRequestType($message);
-        echo $requestType . '<br>';
+        $request = analyseRequest($request);
 
-        // Extract location information from the message
-        $locations = parseLocations($message);
+        print_r($request);
 
-        // Get the bus times 
-        $buses = getDirections($locations);
-        //print_r($buses);
+        if ($request["type"] == 'directions') {
+            
+            // Extract location information from the message
+            $locations = parseLocations($request["message"]);
 
-        // Format the response
-        $response = formatResponse($buses);
-        echo $response . '<br>';
+            // Get the bus times 
+            $buses = getDirections($locations);
+            //print_r($buses);
 
-        // STEP 3: SEND THE MESSAGES
-        if ($sendingON == true) {
+            // Format the response
+            $response = formatResponse($buses);
+            echo $response . '<br>';
 
-            //Send a response
-            try {
-                $message = $client->account->messages->create(array(
-                    "From"  => $fromNumber,
-                    "To"    => $request["phone"],
-                    "Body"  => $response,
-                ));
-            } catch (Services_Twilio_RestException $e) {
-                echo $e->getMessage();
+            // STEP 3: SEND THE MESSAGES
+            if ($sendingON == true) {
+
+                //Send a response
+                try {
+                    $message = $client->account->messages->create(array(
+                        "From"  => $fromNumber,
+                        "To"    => $request["phone"],
+                        "Body"  => $response,
+                    ));
+                } catch (Services_Twilio_RestException $e) {
+                    echo $e->getMessage();
+                }
+
+                // Update request status
+                updateRequestStatus($request['Sid'], $message->status, $conn);
+
+
+            } else {
+                echo "Sending is turned off. Please check the settings!<Br>";
             }
 
-            // Update request status
-            updateRequestStatus($request['Sid'], $message->status, $conn);
-
-
         } else {
-            echo "Sending is turned off. Please check the settings!<Br>";
+
+            updateLocations($request, $conn);
+
         }
+
+
 
     }
 
