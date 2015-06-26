@@ -28,8 +28,15 @@
         // Print a log message
         echo 'A new bus directions request from ' . $request["phone"] . ' for ' .  $request["message"] . '<br>';
 
+        // Clean the message
+        $message = cleanMessage($request["message"]);
+
+        // Determine the request type
+        $requestType = getRequestType($message);
+        echo $requestType . '<br>';
+
         // Extract location information from the message
-        $locations = parseLocations($request["message"]);
+        $locations = parseLocations($message);
 
         // Get the bus times 
         $buses = getDirections($locations);

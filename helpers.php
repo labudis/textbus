@@ -27,6 +27,30 @@
 	        return $plural;
 	}
 
+	// Check what the string starts with
+	function startsWith($haystack, $needle) {
+	    // search backwards starting from haystack length characters from the end
+	    return $needle === "" || strrpos($haystack, $needle, -strlen($haystack)) !== FALSE;
+	}
+
+	// Check what the string ends with
+	function endsWith($haystack, $needle) {
+	    // search forward starting from end minus needle length characters
+	    return $needle === "" || (($temp = strlen($haystack) - strlen($needle)) >= 0 && strpos($haystack, $needle, $temp) !== FALSE);
+	}
+
+
+	function cleanMessage($message) {
+
+		// Turn to lower case
+		$message = strtolower ($message);
+
+		// Remove apostrophes
+		$message = str_replace("'", "", $message);
+
+		return $message;
+	}
+
 
 	// Make our API request
 	function getJSON($url) {
@@ -62,8 +86,8 @@
 	           
 	            // Save messages to the database if they don't already exist
 	            $SaveSQL = "INSERT INTO requests (Sid, message, phone) 
-	                        VALUES ('$message->sid', '$messageBody', '$message->from') 
-	                            ON DUPLICATE KEY UPDATE Sid=Sid";
+	                        	VALUES ('$message->sid', '$messageBody', '$message->from') 
+	                            	ON DUPLICATE KEY UPDATE Sid=Sid";
 
 	            if (mysqli_query($conn, $SaveSQL)) {
 	                //echo "New record created successfully<br>";
@@ -71,10 +95,23 @@
 	                echo "Error: " . $SaveSQL . "<br>" . mysqli_error($conn);
 	            }
 
+	            // Save users to the database
+                $SaveSQL = "INSERT INTO users (phone)
+                    			VALUES ('$message->from')
+                    				ON DUPLICATE KEY UPDATE phone=phone";
+
+                if (mysqli_query($conn, $SaveSQL)) {
+	                //echo "New record created successfully<br>";
+	            } else {
+	                echo "Error: " . $SaveSQL . "<br>" . mysqli_error($conn);
+	            }
+
+
 	        }
 	    }
 
 	}
+
 
 	// Get new requests
 	function getNewRequests($conn) {
@@ -153,8 +190,7 @@
 		//var_dump($buses);
 
 		$bus = $buses[0];
-
-		print_r($bus);
+		//print_r($bus);
 
 		if ($bus) {
 			$response = 'Take bus ' . $bus->name_short . ' for ' . $bus->headsign . ' at ' . $bus->departure_time . ' from stop ' . $bus->departure_stop . '. Get off after ' . $bus->stop_count . ' stop' . plural($bus->stop_count) . ' at ' . $bus->arrival_stop . ' at ' . $bus->arrival_time . '.'; 
@@ -185,6 +221,22 @@
         } else {
             echo "Error updating record: " . $conn->error;
         }
+	}
+
+
+	// Determine the type of request
+	function getRequestType($message) {
+
+		if (startsWith($message, 'home set') == true) {
+			$type = 'home';
+		} else if (startsWith($message, 'work set') == true) {
+			$type = 'work';
+		} else {
+			$type = 'directions';
+		}
+
+		return $type;
+
 	}
 
 
