@@ -42,13 +42,14 @@
         // STEP 3: SEND THE MESSAGES
         if ($sendingON == true) {
 
-            // Send a response
-            // $message = $client->account->messages->create(array(
-            //     "From"  => $fromNumber,
-            //     "To"    => $request["phone"],
-            //     "Body"  => $response,
-            // ));
+            //Send a response
+            $message = $client->account->messages->create(array(
+                "From"  => $fromNumber,
+                "To"    => $request["phone"],
+                "Body"  => $response,
+            ));
 
+            // Update request status
             updateRequestStatus($request['Sid'], $conn);
 
 
