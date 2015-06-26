@@ -132,7 +132,9 @@
 				$bus->name_long 		= $steps->transit_details->line->name;
 				$bus->headsign			= $steps->transit_details->headsign;
 				$bus->departure_time 	= $steps->transit_details->departure_time->text;
-				$bus->stop_name 		= $steps->transit_details->departure_stop->name;
+				$bus->departure_stop	= $steps->transit_details->departure_stop->name;
+				$bus->arrival_time 		= $steps->transit_details->arrival_time->text;
+				$bus->arrival_stop		= $steps->transit_details->arrival_stop->name;
 				$bus->stop_count        = $steps->transit_details->num_stops;
 
 				$buses[] = $bus;
@@ -155,7 +157,7 @@
 		print_r($bus);
 
 		if ($bus) {
-			$response = 'Take bus ' . $bus->name_short . ' for ' . $bus->headsign . ' at ' . $bus->departure_time . ' from stop ' . $bus->stop_name . ' and get off after ' . $bus->stop_count . ' stop' . plural($bus->stop_count) . '.';
+			$response = 'Take bus ' . $bus->name_short . ' for ' . $bus->headsign . ' at ' . $bus->departure_time . ' from stop ' . $bus->departure_stop . '. Get off after ' . $bus->stop_count . ' stop' . plural($bus->stop_count) . ' at ' . $bus->arrival_stop . ' at ' . $bus->arrival_time . '.'; 
 		} else {
 			$response = 'Sorry, there is no bus nearby';
 		}
