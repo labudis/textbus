@@ -1,22 +1,13 @@
  <?php
-    // helpers
+    // Include helpers and configuration settings
     include "helpers.php";
+    include "config.php";
    
     // Twilio
     require "lib/twilio/Services/Twilio.php";
-    $AccountSid = "AC76809471f6ff3116507257fe31f2a595";
-    $AuthToken = "5ff20a1f6f13fc44e0e67689dfbe5e3c";
-    $fromNumber = "441785472337";
     $client = new Services_Twilio($AccountSid, $AuthToken);
 
-    // MySQL database
-    $user = 'root';
-    $password = 'root';
-    $db = 'textbus';
-    $host = 'localhost';
-    $port = 3306;
-    
-    // Create connection
+    // Connect to Database
     $conn = mysqli_connect($host, $user, $password, $db);
     // Check connection
     if (!$conn) {
@@ -29,6 +20,9 @@
     foreach ($client->account->messages as $message) {
         // Show inbound messages only
         if ($message->direction == "inbound") {
+
+            // Strip slashes
+            $message->body = mysql_real_escape_string($message->body);
            
             // Save messages to the database if they don't already exist
             $SaveSQL = "INSERT INTO requests (Sid, message, phone) 
@@ -67,24 +61,30 @@
 
         // Format the response
         $response = formatResponse($buses);
-
         echo $response . '<br>';
 
-        // Send a response
-        $message = $client->account->messages->create(array(
-            "From"  => $fromNumber,
-            "To"    => $request["phone"],
-            "Body"  => $response,
-        ));
+        // STEP 3: SEND THE MESSAGES
+        if ($sendingON == true) {
 
-        // Update the status of the request
-        $requestSid = $request['Sid'];
-        $UpdateSQL = "UPDATE requests SET status='1' WHERE Sid='$requestSid'";
+            // Send a response
+            $message = $client->account->messages->create(array(
+                "From"  => $fromNumber,
+                "To"    => $request["phone"],
+                "Body"  => $response,
+            ));
 
-        if ($conn->query($UpdateSQL) === TRUE) {
-            //echo "Record updated successfully";
+            // Update the status of the request
+            $requestSid = $request['Sid'];
+            $UpdateSQL = "UPDATE requests SET status='1' WHERE Sid='$requestSid'";
+
+            if ($conn->query($UpdateSQL) === TRUE) {
+                //echo "Record updated successfully";
+            } else {
+                echo "Error updating record: " . $conn->error;
+            }
+
         } else {
-            echo "Error updating record: " . $conn->error;
+            echo "Sending is turned off. Please check the settings!<Br>";
         }
 
     }
