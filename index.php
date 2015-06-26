@@ -21,12 +21,12 @@
         // Show inbound messages only
         if ($message->direction == "inbound") {
 
-            // Strip slashes
-            $message->body = mysql_real_escape_string($message->body);
+            // Strip apostrophes
+            $messageBody = str_replace("'", "", $message->body);
            
             // Save messages to the database if they don't already exist
             $SaveSQL = "INSERT INTO requests (Sid, message, phone) 
-                        VALUES ('$message->sid', '$message->body', '$message->from') 
+                        VALUES ('$message->sid', '$messageBody', '$message->from') 
                             ON DUPLICATE KEY UPDATE Sid=Sid";
 
             if (mysqli_query($conn, $SaveSQL)) {
