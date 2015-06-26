@@ -43,14 +43,18 @@
         if ($sendingON == true) {
 
             //Send a response
-            $message = $client->account->messages->create(array(
-                "From"  => $fromNumber,
-                "To"    => $request["phone"],
-                "Body"  => $response,
-            ));
+            try {
+                $message = $client->account->messages->create(array(
+                    "From"  => $fromNumber,
+                    "To"    => $request["phone"],
+                    "Body"  => $response,
+                ));
+            } catch (Services_Twilio_RestException $e) {
+                echo $e->getMessage();
+            }
 
             // Update request status
-            updateRequestStatus($request['Sid'], $conn);
+            updateRequestStatus($request['Sid'], $message->status, $conn);
 
 
         } else {

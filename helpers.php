@@ -155,10 +155,17 @@
 
 
 	// Update the request status to 1 after the message has been sent
-	function updateRequestStatus($requestSid, $conn) {
+	function updateRequestStatus($requestSid, $messageStatus, $conn) {
+
+        // Check the message status
+        if ($messageStatus == 'failed') {
+            $status = 2;
+        } else {
+            $status = 1;
+        }
 
 	    // Update the status of the request
-        $UpdateSQL = "UPDATE requests SET status='1' WHERE Sid='$requestSid'";
+        $UpdateSQL = "UPDATE requests SET status='$status' WHERE Sid='$requestSid'";
 
         if ($conn->query($UpdateSQL) === TRUE) {
             //echo "Record updated successfully";
